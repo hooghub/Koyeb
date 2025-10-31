@@ -1,0 +1,7 @@
+streamlit-node-tool/
+│
+├─ app.py
+├─ requirements.txt
+├─ .streamlit/
+│   └─ config.toml
+└─ Procfile
