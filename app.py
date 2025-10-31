@@ -1,50 +1,46 @@
 import streamlit as st
-import uuid
-import socket
 import requests
+import random
+import socket
 
 st.set_page_config(page_title="VLESS/HY2 节点工具", layout="centered")
 
-st.title("🌐 VLESS/HY2 节点工具")
+st.title("🌐 VLESS / HY2 节点工具")
 
-# 1️⃣ 获取公网 IP
+# 自动获取公网 IP
 def get_public_ip():
     try:
-        ip = requests.get("https://api.ipify.org").text
-        return ip
+        return requests.get("https://api.ipify.org").text
     except:
-        return "无法获取公网 IP"
+        return "获取失败"
 
-public_ip = get_public_ip()
-st.subheader("当前实例公网 IP:")
-st.code(public_ip)
+ip = get_public_ip()
+st.write(f"**公网 IP:** {ip}")
 
-# 2️⃣ 检测 TCP 端口
-def check_port(host, port):
+# 随机端口示例
+port = random.randint(10000, 65000)
+st.write(f"**端口:** {port}")
+
+# 检测 TCP 端口是否开放
+def check_port(ip, port):
     try:
-        with socket.create_connection((host, port), timeout=2):
-            return True
+        with socket.create_connection((ip, port), timeout=2):
+            return "✅ 可用"
     except:
-        return False
+        return "❌ 不可用"
 
-st.subheader("端口检测（示例 443）:")
-port_status = check_port(public_ip, 443)
-st.write(f"TCP 443: {'✅ 可用' if port_status else '❌ 不可用'}")
+status = check_port(ip, port)
+st.write(f"**端口状态:** {status}")
 
-# 3️⃣ 自动生成随机 VLESS/HY2 节点
-st.subheader("随机生成节点链接:")
+# 随机 UUID 生成 VLESS / HY2 链接
+import uuid
+node_uuid = str(uuid.uuid4())
 
-def generate_vless(ip, port=443):
-    node_uuid = str(uuid.uuid4())
-    return f"vless://{node_uuid}@{ip}:{port}?encryption=none&security=tls&type=tcp#示例VLESS节点"
+vless_link = f"vless://{node_uuid}@{ip}:{port}?encryption=none&security=tls&type=tcp#示例VLESS节点"
+hy2_link = f"hy2://{node_uuid}@{ip}:{port}#示例HY2节点"
 
-def generate_hy2(ip, port=443):
-    node_uuid = str(uuid.uuid4())
-    return f"hy2://{node_uuid}@{ip}:{port}#示例HY2节点"
-
-vless_link = generate_vless(public_ip)
-hy2_link = generate_hy2(public_ip)
-
+st.write("**VLESS 链接:**")
 st.code(vless_link, language="text")
+
+st.write("**HY2 链接:**")
 st.code(hy2_link, language="text")
-st.info("⚠️ 注意：这些节点仅演示格式，可用于导入 v2rayN，但 Koyeb 本身无法开放 TCP/UDP 端口。")
