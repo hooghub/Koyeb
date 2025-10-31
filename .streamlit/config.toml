@@ -1,7 +1,4 @@
-streamlit-node-tool/
-│
-├─ app.py
-├─ requirements.txt
-├─ .streamlit/
-│   └─ config.toml
-└─ Procfile
+[server]
+headless = true
+enableCORS = false
+port = 8501
